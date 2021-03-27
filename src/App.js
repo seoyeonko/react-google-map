@@ -8,7 +8,7 @@ import {
 } from "react-google-maps";
 import Geocode from "react-geocode";
 import { Descriptions } from "antd";
-// import styled from "styled-components";
+import AutoComplete from "react-google-autocomplete";
 
 Geocode.setApiKey("AIzaSyCbEYP93AgVjmUf9Eea7Qm9O6uWW3f33-A");
 
@@ -113,6 +113,7 @@ class App extends React.Component {
 
   // render method
   render() {
+    // MapWithAMarker Component
     const MapWithAMarker = withScriptjs(
       withGoogleMap((props) => (
         <GoogleMap
@@ -135,10 +136,22 @@ class App extends React.Component {
               <div>hello~!!</div>
             </InfoWindow>
           </Marker>
+          <AutoComplete
+            style={{
+              width: "100%",
+              height: "40px",
+              paddingLeft: 16,
+              marginTop: 2,
+              marginBottom: "2rem",
+            }}
+            types={["(regions)"]}
+          />
         </GoogleMap>
       ))
     );
 
+    // return method
+    // Title, Descriptions, MapWithAMarker, Auto-Compelete Serach
     return (
       <div style={{ padding: "1rem", margin: "0 auto", maxWidth: 1000 }}>
         <h1>
