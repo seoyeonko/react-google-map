@@ -7,6 +7,7 @@ import {
   Marker,
 } from "react-google-maps";
 import Geocode from "react-geocode";
+import { Descriptions } from "antd";
 // import styled from "styled-components";
 
 Geocode.setApiKey("AIzaSyCbEYP93AgVjmUf9Eea7Qm9O6uWW3f33-A");
@@ -19,15 +20,15 @@ class App extends React.Component {
     city: "",
     area: "",
     state: "",
-    zoom: 15,
-    height: 40,
+    zoom: 14,
+    height: 400,
     mapPosition: {
-      lat: 0,
-      lng: 0,
+      lat: 37.65138565838383,
+      lng: 127.01619258483166,
     },
     markerPosition: {
-      lat: 0,
-      lng: 0,
+      lat: 37.65138565838383,
+      lng: 127.01619258483166,
     },
   };
 
@@ -80,33 +81,54 @@ class App extends React.Component {
   onMarkerDragEnd = (event) => {
     let newLat = event.latLng.lat();
     let newLng = event.latLng.lng();
+
     Geocode.fromLatLng(newLat, newLng).then((response) => {
       console.log("response", response);
 
       // information
-      const address = response.result[0].formatted_address,
-        addressArray = response.result[0].address_components,
+      const address = response.results[0].formatted_address,
+        addressArray = response.results[0].address_components,
         city = this.getCity(addressArray),
         area = this.getArea(addressArray),
         state = this.getState(addressArray);
 
       //setState
-      this.setState();
+      this.setState({
+        address: address ? address : "",
+        area: area ? area : "",
+        city: city ? city : "",
+        state: state ? state : "",
+        markerPosition: {
+          lat: newLat,
+          lng: newLng,
+        },
+        mapPosition: {
+          lat: newLat,
+          lng: newLng,
+        },
+      });
     });
     console.log("newLat", newLat);
   };
 
+  // render method
   render() {
     const MapWithAMarker = withScriptjs(
       withGoogleMap((props) => (
         <GoogleMap
-          defaultZoom={8}
-          defaultCenter={{ lat: -34.397, lng: 150.644 }}
+          defaultZoom={this.state.zoom}
+          defaultCenter={{
+            lat: this.state.mapPosition.lat,
+            lng: this.state.mapPosition.lng,
+          }}
         >
           <Marker
             draggable={true}
             onDragEnd={this.onMarkerDragEnd}
-            position={{ lat: -34.397, lng: 150.644 }}
+            position={{
+              lat: this.state.markerPosition.lat,
+              lng: this.state.markerPosition.lng,
+            }}
           >
             {/* Add draggable & onDragEnd attribute */}
             <InfoWindow>
@@ -118,12 +140,28 @@ class App extends React.Component {
     );
 
     return (
-      <MapWithAMarker
-        googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbEYP93AgVjmUf9Eea7Qm9O6uWW3f33-A&v=3.exp&libraries=geometry,drawing,places"
-        loadingElement={<div style={{ height: `100%` }} />}
-        containerElement={<div style={{ height: `400px` }} />}
-        mapElement={<div style={{ height: `100%` }} />}
-      />
+      <div style={{ padding: "1rem", margin: "0 auto", maxWidth: 1000 }}>
+        <h1>
+          <b>Google Map Basic</b>
+        </h1>
+        <Descriptions bordered>
+          <Descriptions.Item label="City">{this.state.city}</Descriptions.Item>
+          <Descriptions.Item label="Area">{this.state.area}</Descriptions.Item>
+          <Descriptions.Item label="State">
+            {this.state.state}
+          </Descriptions.Item>
+          <Descriptions.Item label="Adress">
+            {this.state.address}
+          </Descriptions.Item>
+        </Descriptions>
+
+        <MapWithAMarker
+          googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbEYP93AgVjmUf9Eea7Qm9O6uWW3f33-A&v=3.exp&libraries=geometry,drawing,places"
+          loadingElement={<div style={{ height: `100%` }} />}
+          containerElement={<div style={{ height: `400px` }} />}
+          mapElement={<div style={{ height: `100%` }} />}
+        />
+      </div>
     );
   }
 }
