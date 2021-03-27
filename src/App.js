@@ -16,7 +16,7 @@ Geocode.setApiKey("AIzaSyCbEYP93AgVjmUf9Eea7Qm9O6uWW3f33-A");
 class App extends React.Component {
   // state
   state = {
-    address: "",
+    address: "Where is it?",
     city: "",
     area: "",
     state: "",
@@ -82,6 +82,7 @@ class App extends React.Component {
     let newLat = event.latLng.lat();
     let newLng = event.latLng.lng();
 
+    // Geocode: lat, lng를 이용해 address, city, area, state를 알기 위함
     Geocode.fromLatLng(newLat, newLng).then((response) => {
       console.log("response", response);
 
@@ -111,6 +112,32 @@ class App extends React.Component {
     console.log("newLat", newLat);
   };
 
+  onPlaceSelected = (place) => {
+    const address = place.formatted_address,
+      addressArray = place.address_components,
+      city = this.getCity(addressArray),
+      area = this.getArea(addressArray),
+      state = this.getState(addressArray),
+      newLat = place.geometry.location.lat(),
+      newLng = place.geometry.location.lng();
+
+    //setState
+    this.setState({
+      address: address ? address : "",
+      area: area ? area : "",
+      city: city ? city : "",
+      state: state ? state : "",
+      markerPosition: {
+        lat: newLat,
+        lng: newLng,
+      },
+      mapPosition: {
+        lat: newLat,
+        lng: newLng,
+      },
+    });
+  };
+
   // render method
   render() {
     // MapWithAMarker Component
@@ -133,7 +160,7 @@ class App extends React.Component {
           >
             {/* Add draggable & onDragEnd attribute */}
             <InfoWindow>
-              <div>hello~!!</div>
+              <div>{this.state.address}</div>
             </InfoWindow>
           </Marker>
           <AutoComplete
@@ -145,6 +172,7 @@ class App extends React.Component {
               marginBottom: "2rem",
             }}
             types={["(regions)"]}
+            onPlaceSelected={this.onPlaceSelected}
           />
         </GoogleMap>
       ))
@@ -180,11 +208,3 @@ class App extends React.Component {
 }
 
 export default App;
-
-// Style
-// const Container = styled.div`
-//   background-color: #a3b18a;
-//   height: 100%;
-//   width: 700px;
-//   left: 480px;
-// `;
